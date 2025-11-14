@@ -48,6 +48,8 @@ const router = createBrowserRouter([
             return null
         }
     }
-])
+], {
+    basename: '/CMS_Tank/'
+})
 
 export default router
