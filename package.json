@@ -5,12 +5,11 @@
   "type": "module",
   "homepage": "https://anhnlv119.github.io/CMS_Tank/",
   "scripts": {
-    "build": "vite build",
-    "deploy": "npm run build && gh-pages -d dist",
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "npm run build && gh-pages -d dist",
+    "lint": "eslint ."
   },
   "dependencies": {
     "axios": "^1.13.2",

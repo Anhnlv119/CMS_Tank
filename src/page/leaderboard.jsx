@@ -14,11 +14,13 @@ function Leaderboard() {
     const fetchLeaderboard = async () => {
       try {
         const response = await axios.get(
-          "http://146.88.41.51:8998/leaderboard?minigame_type=survival",
+          "https://cors-anywhere.herokuapp.com/http://146.88.41.51:8998/leaderboard?minigame_type=survival",
           {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("authToken"),
             },
+                        mode: 'cors',
+            credentials: 'include'
           }
         );
 
