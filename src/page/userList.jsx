@@ -9,12 +9,11 @@ function ListUsers() {
 
   const componentDidMount = async () => {
     axios
-      .get("https://cors-anywhere.herokuapp.com/http://146.88.41.51:8998/user/users", {
+      .get("http://146.88.41.51:8998/user/users", {
         headers: {
           Authorization: "Bearer " + localStorage.getItem("authToken"),
         },
-                    mode: 'cors',
-            credentials: 'include'
+                  
       })
       .then((response) => {
         const data = response.data;

@@ -29,8 +29,6 @@ const navigate = useNavigate();
            username, 
            password: hashedPassword 
          }),
-            mode: 'cors',
-            credentials: 'include'
        });
  
        if (!response.ok) {
@@ -61,7 +59,7 @@ const navigate = useNavigate();
      } catch (err) {
        setError(err.message);
        setIsLoading(false);
-       console.log(username + "/n" + password + "/n" + err.message);
+       console.log(username + "\n" + password + "\n" + err.message);
      }
    };
 
