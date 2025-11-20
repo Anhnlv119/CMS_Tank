@@ -13,7 +13,6 @@ function ListUsers() {
         headers: {
           Authorization: "Bearer " + localStorage.getItem("authToken"),
         },
-                  
       })
       .then((response) => {
         const data = response.data;
@@ -53,36 +52,46 @@ function ListUsers() {
   };
 
   return (
-    <div>
-      <div className="App">
-        <div className="py-2 container">
-          <nav className="navbar navbar-expand-lg navbar-light bg-light">
+    <div className="App">
+      <div className="py-2 container">
+        <nav className="navbar navbar-expand-lg navbar-light bg-light">
           <div className="container-fluid">
             <div className="collapse navbar-collapse center" id="navbarNav">
               <ul className="navbar-nav">
-                <li className="nav-item ps-5 pe-5">
+                <li className="nav-item ps-5 pe-5 btn btn-outline-secondary ms-2 me-2">
                   <Link
                     className="nav-link active"
                     aria-current="page"
                     to={{
-                      pathname: "/leaderboard/daily",
+                      pathname: "/leaderboard/day",
                     }}
                   >
                     Daily
                   </Link>
                 </li>
-                <li className="nav-item ps-5 pe-5">
+                <li className="nav-item ps-5 pe-5 btn btn-outline-secondary ms-2 me-2">
                   <Link
                     className="nav-link active"
                     aria-current="page"
                     to={{
-                      pathname: "/leaderboard/weekly",
+                      pathname: "/leaderboard/week",
                     }}
                   >
                     Weekly
                   </Link>
                 </li>
-                <li className="nav-item ps-5 pe-5">
+                <li className="nav-item ps-5 pe-5 btn btn-outline-secondary ms-2 me-2">
+                  <Link
+                    className="nav-link active"
+                    aria-current="page"
+                    to={{
+                      pathname: "/leaderboard/month",
+                    }}
+                  >
+                    Monthly
+                  </Link>
+                </li>
+                <li className="nav-item ps-5 pe-5 btn btn-outline-secondary ms-2 me-2">
                   <Link
                     className="nav-link active"
                     aria-current="page"
@@ -93,102 +102,112 @@ function ListUsers() {
                     User List
                   </Link>
                 </li>
+                <li className="nav-item ps-5 pe-5 btn btn-outline-secondary ms-2 me-2">
+                  <Link
+                    className="nav-link active"
+                    aria-current="page"
+                    to={{
+                      pathname: "/subscription-history",
+                    }}
+                  >
+                    Subscription History
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>
         </nav>
-          <div className="row">
-            <div className="col-12">
-              <h2 className="h2 fw-bold">Users</h2>
-            </div>
-            <div className="col-12">
-              <table className="table table-striped table-hover">
-                <thead>
+        <div className="row">
+          <div className="col-12">
+            <h2 className="h2 fw-bold">Users</h2>
+          </div>
+          <div className="col-12">
+            <table className="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>username</th>
+                  <th>name</th>
+                  <th>roles</th>
+                </tr>
+              </thead>
+              {isLoading ? (
+                <tbody>
                   <tr>
-                    <th>username</th>
-                    <th>name</th>
-                    <th>roles</th>
+                    <td colSpan="4" className="text-center py-4">
+                      Loading...
+                    </td>
                   </tr>
-                </thead>
-                {isLoading ? (
-                  <tbody>
-                    <tr>
-                      <td colSpan="4" className="text-center py-4">
-                        Loading...
-                      </td>
+                </tbody>
+              ) : (
+                <tbody>
+                  {currentUsers.map((user) => (
+                    <tr className="cursor-pointer" key={user.username}>
+                      <td>{user.username}</td>
+                      <td>{user.name}</td>
+                      <td>{user.roles}</td>
                     </tr>
-                  </tbody>
-                ) : (
-                  <tbody>
-                    {currentUsers.map((user) => (
-                      <tr className="cursor-pointer" key={user.username}>
-                        <td>{user.username}</td>
-                        <td>{user.name}</td>
-                        <td>{user.roles}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                )}
-              </table>
+                  ))}
+                </tbody>
+              )}
+            </table>
 
-              {/* Pagination Controls */}
-              <div className="d-flex justify-content-between align-items-center mt-3">
-                <div>
-                  <span>
-                    Page {currentPage} of {totalPages} • Showing{" "}
-                    {currentUsers.length} of {users.length} users
-                  </span>
-                </div>
-                <nav>
-                  <ul className="pagination mb-0">
-                    <li
-                      className={`page-item ${
-                        currentPage === 1 ? "disabled" : ""
-                      }`}
-                    >
-                      <button
-                        className="page-link"
-                        onClick={handlePreviousPage}
-                        disabled={currentPage === 1}
-                      >
-                        Previous
-                      </button>
-                    </li>
-
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                      (page) => (
-                        <li
-                          key={page}
-                          className={`page-item ${
-                            currentPage === page ? "active" : ""
-                          }`}
-                        >
-                          <button
-                            className="page-link"
-                            onClick={() => goToPage(page)}
-                          >
-                            {page}
-                          </button>
-                        </li>
-                      )
-                    )}
-
-                    <li
-                      className={`page-item ${
-                        currentPage === totalPages ? "disabled" : ""
-                      }`}
-                    >
-                      <button
-                        className="page-link"
-                        onClick={handleNextPage}
-                        disabled={currentPage === totalPages}
-                      >
-                        Next
-                      </button>
-                    </li>
-                  </ul>
-                </nav>
+            {/* Pagination Controls */}
+            <div className="d-flex justify-content-between align-items-center mt-3">
+              <div>
+                <span>
+                  Page {currentPage} of {totalPages} • Showing{" "}
+                  {currentUsers.length} of {users.length} users
+                </span>
               </div>
+              <nav>
+                <ul className="pagination mb-0">
+                  <li
+                    className={`page-item ${
+                      currentPage === 1 ? "disabled" : ""
+                    }`}
+                  >
+                    <button
+                      className="page-link"
+                      onClick={handlePreviousPage}
+                      disabled={currentPage === 1}
+                    >
+                      Previous
+                    </button>
+                  </li>
+
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                    (page) => (
+                      <li
+                        key={page}
+                        className={`page-item ${
+                          currentPage === page ? "active" : ""
+                        }`}
+                      >
+                        <button
+                          className="page-link"
+                          onClick={() => goToPage(page)}
+                        >
+                          {page}
+                        </button>
+                      </li>
+                    )
+                  )}
+
+                  <li
+                    className={`page-item ${
+                      currentPage === totalPages ? "disabled" : ""
+                    }`}
+                  >
+                    <button
+                      className="page-link"
+                      onClick={handleNextPage}
+                      disabled={currentPage === totalPages}
+                    >
+                      Next
+                    </button>
+                  </li>
+                </ul>
+              </nav>
             </div>
           </div>
         </div>
