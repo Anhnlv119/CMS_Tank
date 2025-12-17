@@ -3,12 +3,23 @@ import Login from "../page/login.jsx"
 import ListUsers from "../page/userList.jsx"
 import Leaderboard from "../page/leaderboard.jsx"
 import SubscriptionHistory from "../page/subscriptionHistory.jsx"
+import { isSessionValid, clearAuth } from "../utils/sessionManager"
+import PackageStatistics from "../page/packageStatistics.jsx"
+
+// Loader function to check authentication
+const checkAuth = () => {
+  if (!isSessionValid()) {
+    clearAuth();
+    return redirect('/login');
+  }
+  return null;
+};
+
 const router = createBrowserRouter([
     {
         path: '/',
         loader: () => {
-            const token = localStorage.getItem('authToken');
-            if (token) {
+            if (isSessionValid()) {
                 return redirect('/home')
             } else {
                 return redirect('/login')
@@ -18,20 +29,13 @@ const router = createBrowserRouter([
     {
         path: '/leaderboard/:leaderboard',
         element: <Leaderboard />,
-        loader: () => {
-            const token = localStorage.getItem('authToken');
-            if (!token) {
-                return redirect('/login')
-            }
-            return null
-        }
+        loader: checkAuth
     },
     {
         path: '/login',
         element: <Login />,
         loader: () => {
-            const token = localStorage.getItem('authToken');
-            if (token) {
+            if (isSessionValid()) {
                 return redirect('/home')
             }
             return null
@@ -40,24 +44,17 @@ const router = createBrowserRouter([
     {
         path: '/subscription-history',
         element: <SubscriptionHistory />,
-        loader: () => {
-            const token = localStorage.getItem('authToken');
-            if (!token) {
-                return redirect('/login')
-            }
-            return null
-        }
+        loader: checkAuth
     },
     {
         path: '/home',
         element: <ListUsers />,
-        loader: () => {
-            const token = localStorage.getItem('authToken');
-            if (!token) {
-                return redirect('/login')
-            }
-            return null
-        }
+        loader: checkAuth
+    },
+    {
+        path: '/package-statisticsry',
+        element: <PackageStatistics />,
+        loader: checkAuth
     }
 ], {
     basename: '/CMS_Tank/'

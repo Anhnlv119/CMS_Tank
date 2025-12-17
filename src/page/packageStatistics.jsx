@@ -4,18 +4,17 @@ import axios from "axios";
 import { Link, useParams } from "react-router-dom";
 import { getToken } from "../utils/sessionManager";
 import Header from "./header.jsx";
-
-export default function SubscriptionHistory() {
-  const [fromDate, setFromDate] = useState("");
-  const [toDate, setToDate] = useState("");
-  const [users, setUsers] = useState([]);
-  const [msisdn, setMsisdn] = useState("");
-  const [limit, setLimit] = useState();
-  const [offset, setOffset] = useState();
-  const [isLoading, setIsLoading] = useState(true);
-  const { params } = useParams();
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+export default function PackageStatistics() {
+    const [users, setUsers] = useState([]);
+    const [fromDate, setFromDate] = useState("");
+    const [toDate, setToDate] = useState("");
+    const [sortBy, setSortBy] = useState("totalTransactions");
+    const [limit, setLimit] = useState(0);
+    const [sortOrder, setSortOrder] = useState('desc');
+    const [isLoading, setIsLoading] = useState(true);
+    const { params } = useParams();
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(10);
   
 
   useEffect(() => {
@@ -26,22 +25,22 @@ export default function SubscriptionHistory() {
     setIsLoading(true);
     try {
       const params = new URLSearchParams({
-        msisdn: msisdn,
         startDate: fromDate,
         endDate: toDate,
+        sortBy: sortBy,
+        sortOrder: sortOrder,
         limit: limit,
-        offset: offset,
       });
 
       const response = await axios.get(
-        `http://146.88.41.51:8998/package/packages/transactions?${params.toString()}`,
+        `http://146.88.41.51:8998/package/package-statistics?${params.toString()}`,
         {
           headers: {
           Authorization: "Bearer " + getToken(),
           },
         }
       );
-      setUsers(response.data.data.transactions || []);
+      setUsers(response.data.statistics || []);
       setCurrentPage(1);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -76,12 +75,11 @@ export default function SubscriptionHistory() {
     setCurrentPage(pageNumber);
   };
 
-  const totalValue = users.reduce((acc, row) => acc + parseInt(row.price), 0);
 
   return (
     <div className="min-vh-100 bg-light p-5 pt-1">
       <div className="container-lg">
-        <Header />
+            <Header />    
         <hr />
         <h1 className="display-5 fw-bold text-dark mb-4">
           SUBSCRIPTION PURCHASE HISTORY
@@ -122,24 +120,11 @@ export default function SubscriptionHistory() {
               </div>
 
               <div className="col-12 col-md-3">
-                <label className="form-label fw-medium">User name:</label>
-                <input
-                  type="text"
-                  value={msisdn}
-                  onChange={(e) => setMsisdn(e.target.value)}
-                  placeholder="Enter username"
-                  className="form-control"
-                />
-              </div>
-
-              <div className="col-12 col-md-3">
                 <button className="btn btn-primary w-100" onClick={handleSearch}>SEARCH</button>
               </div>
             </div>
 
-            <div className="mt-3 fw-semibold">
-              Total value: <span className="text-danger">{totalValue}</span>
-            </div>
+    
           </div>
         </div>
 
@@ -150,14 +135,10 @@ export default function SubscriptionHistory() {
               <thead className="table-light">
                 <tr>
                   <th className="fw-semibold">STT</th>
-                  <th className="fw-semibold">Username</th>
-                  <th className="fw-semibold">Transaction ID</th>
-                  <th className="fw-semibold">Price</th>
-                  <th className="fw-semibold">Package code</th>
-                  <th className="fw-semibold">Created date</th>
-                  <th className="fw-semibold">Source</th>
-                  <th className="fw-semibold">Message</th>
-                  <th className="fw-semibold">Status</th>
+                  <th className="fw-semibold">Package name</th>
+                  <th className="fw-semibold">Total transaction</th>
+                  <th className="fw-semibold">Total money</th>
+                  <th className="fw-semibold">Total diamond</th>
                 </tr>
               </thead>
 
@@ -166,20 +147,10 @@ export default function SubscriptionHistory() {
                   currentUsers.map((row, idx) => (
                     <tr key={idx}>
                       <td>{idx + 1}</td>
-                      <td>{row.msisdn}</td>
-                      <td>
-                        <code>{row.transactionId}</code>
-                      </td>
-                      <td>{row.price}</td>
-                      <td>{row.packageCode}</td>
-                      <td className="text-nowrap">{row.createdAt}</td>
-                      <td>{row.packageType}</td>
                       <td>{row.packageName}</td>
-                      <td>
-                        <span className="text-info fw-medium">
-                          {row.status}
-                        </span>
-                      </td>
+                      <td>{row.totalTransactions}</td>
+                      <td>{row.totalMoney}</td>
+                      <td>{row.totalDiamond}</td>
                     </tr>
                   ))
                 ) : (

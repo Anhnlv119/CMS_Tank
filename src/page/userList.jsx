@@ -1,6 +1,8 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { getToken } from "../utils/sessionManager";
+import Header from "./header.jsx";
 function ListUsers() {
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -10,8 +12,8 @@ function ListUsers() {
   const componentDidMount = async () => {
     axios
       .get("http://146.88.41.51:8998/user/users", {
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("authToken"),
+        headers: {      
+        Authorization: "Bearer " + getToken(),
         },
       })
       .then((response) => {
@@ -54,69 +56,7 @@ function ListUsers() {
   return (
     <div className="App">
       <div className="py-2 container">
-        <nav className="navbar navbar-expand-lg navbar-light bg-light">
-          <div className="container-fluid">
-            <div className="collapse navbar-collapse center" id="navbarNav">
-              <ul className="navbar-nav">
-                <li className="nav-item ps-5 pe-5 btn btn-outline-secondary ms-2 me-2">
-                  <Link
-                    className="nav-link active"
-                    aria-current="page"
-                    to={{
-                      pathname: "/leaderboard/day",
-                    }}
-                  >
-                    Daily
-                  </Link>
-                </li>
-                <li className="nav-item ps-5 pe-5 btn btn-outline-secondary ms-2 me-2">
-                  <Link
-                    className="nav-link active"
-                    aria-current="page"
-                    to={{
-                      pathname: "/leaderboard/week",
-                    }}
-                  >
-                    Weekly
-                  </Link>
-                </li>
-                <li className="nav-item ps-5 pe-5 btn btn-outline-secondary ms-2 me-2">
-                  <Link
-                    className="nav-link active"
-                    aria-current="page"
-                    to={{
-                      pathname: "/leaderboard/month",
-                    }}
-                  >
-                    Monthly
-                  </Link>
-                </li>
-                <li className="nav-item ps-5 pe-5 btn btn-outline-secondary ms-2 me-2">
-                  <Link
-                    className="nav-link active"
-                    aria-current="page"
-                    to={{
-                      pathname: "/",
-                    }}
-                  >
-                    User List
-                  </Link>
-                </li>
-                <li className="nav-item ps-5 pe-5 btn btn-outline-secondary ms-2 me-2">
-                  <Link
-                    className="nav-link active"
-                    aria-current="page"
-                    to={{
-                      pathname: "/subscription-history",
-                    }}
-                  >
-                    Subscription History
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </nav>
+        <Header />
         <div className="row">
           <div className="col-12">
             <h2 className="h2 fw-bold">Users</h2>

@@ -1,14 +1,15 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import Header from "./header.jsx";
 
 function Leaderboard() {
   const { leaderboard } = useParams();
   const [users, setUsers] = useState([]);
-  const [date, setDate] = useState('2025-11-16');
-  const [minigameType, setMinigameType] = useState('survival');
-  const [sortBy, setSortBy] = useState('score');
-  const [sortOrder, setSortOrder] = useState('desc');
+  const [date, setDate] = useState("2025-11-16");
+  const [minigameType, setMinigameType] = useState("survival");
+  const [sortBy, setSortBy] = useState("score");
+  const [sortOrder, setSortOrder] = useState("desc");
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
@@ -26,7 +27,7 @@ function Leaderboard() {
         period: period,
         sort_by: sortBy,
         sort_order: sortOrder,
-        date: date
+        date: date,
       });
 
       const response = await axios.get(
@@ -37,7 +38,7 @@ function Leaderboard() {
           },
         }
       );
-      setUsers(response.data.data.entries||[]);
+      setUsers(response.data.data.entries || []);
       setCurrentPage(1);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -52,14 +53,14 @@ function Leaderboard() {
   };
 
   const handleReset = () => {
-    setDate('2025-11-16');
-    setMinigameType('survival');
-    setSortBy('score');
-    setSortOrder('desc');
+    setDate("2025-11-16");
+    setMinigameType("survival");
+    setSortBy("score");
+    setSortOrder("desc");
   };
 
   // Calculate pagination
-  
+
   const totalPages = Math.ceil(users.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -87,142 +88,90 @@ function Leaderboard() {
   return (
     <div className="App">
       <div className="py-2 container">
-        <nav className="navbar navbar-expand-lg navbar-light bg-light">
-          <div className="container-fluid">
-            <div className="collapse navbar-collapse center" id="navbarNav">
-              <ul className="navbar-nav">
-                <li className="nav-item ps-5 pe-5 btn btn-outline-secondary ms-2 me-2">
-                  <Link
-                    className="nav-link active"
-                    aria-current="page"
-                    to={{
-                      pathname: "/leaderboard/day",
-                    }}
-                  >
-                    Daily
-                  </Link>
-                </li>
-                <li className="nav-item ps-5 pe-5 btn btn-outline-secondary ms-2 me-2">
-                  <Link
-                    className="nav-link active"
-                    aria-current="page"
-                    to={{
-                      pathname: "/leaderboard/week",
-                    }}
-                  >
-                    Weekly
-                  </Link>
-                </li>
-                <li className="nav-item ps-5 pe-5 btn btn-outline-secondary ms-2 me-2">
-                  <Link
-                    className="nav-link active"
-                    aria-current="page"
-                    to={{
-                      pathname: "/leaderboard/month",
-                    }}
-                  >
-                    Monthly
-                  </Link>
-                </li>
-                <li className="nav-item ps-5 pe-5 btn btn-outline-secondary ms-2 me-2">
-                  <Link
-                    className="nav-link active"
-                    aria-current="page"
-                    to={{
-                      pathname: "/",
-                    }}
-                  >
-                    User List
-                  </Link>
-                </li>
-                <li className="nav-item ps-5 pe-5 btn btn-outline-secondary ms-2 me-2">
-                  <Link
-                    className="nav-link active"
-                    aria-current="page"
-                    to={{
-                      pathname: "/subscription-history",
-                    }}
-                  >
-                    Subscription History
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </nav>
+        <Header />
+
         <div className="row">
           <div className="container-fluid p-4">
-          {/* Filter Card */}
-          <div className="card border-0 shadow-sm mb-4">
-            <div className="card-body p-4">
-              <h5 className="card-title fw-bold mb-4 text-uppercase">RANKING BY {leaderboardTitle}</h5>
-              
-              <div className="row g-3 align-items-end mb-3">
-                <div className="col-auto">
-                  <label className="form-label fw-medium mb-2">Date:</label>
-                  <input
-                    type="date"
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                    className="form-control"
-                    style={{ width: '150px' }}
-                  />
-                </div>
+            {/* Filter Card */}
+            <div className="card border-0 shadow-sm mb-4">
+              <div className="card-body p-4">
+                <h5 className="card-title fw-bold mb-4 text-uppercase">
+                  RANKING BY {leaderboardTitle}
+                </h5>
 
-                <div className="col-auto">
-                  <label className="form-label fw-medium mb-2">Minigame Type:</label>
-                  <select
-                    value={minigameType}
-                    onChange={(e) => setMinigameType(e.target.value)}
-                    className="form-select"
-                    style={{ width: '150px' }}
-                  >
-                    <option value="survival">Survival</option>
-                    <option value="arena">Arena</option>
-                  </select>
-                </div>
+                <div className="row g-3 align-items-end mb-3">
+                  <div className="col-auto">
+                    <label className="form-label fw-medium mb-2">Date:</label>
+                    <input
+                      type="date"
+                      value={date}
+                      onChange={(e) => setDate(e.target.value)}
+                      className="form-control"
+                      style={{ width: "150px" }}
+                    />
+                  </div>
 
-                <div className="col-auto">
-                  <label className="form-label fw-medium mb-2">Sort By:</label>
-                  <select
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value)}
-                    className="form-select"
-                    style={{ width: '150px' }}
-                  >
-                    <option value="score">Score</option>
-                    <option value="damage">Damage</option>
-                    <option value="time_survived">Time Survived</option>
-                  </select>
-                </div>
+                  <div className="col-auto">
+                    <label className="form-label fw-medium mb-2">
+                      Minigame Type:
+                    </label>
+                    <select
+                      value={minigameType}
+                      onChange={(e) => setMinigameType(e.target.value)}
+                      className="form-select"
+                      style={{ width: "150px" }}
+                    >
+                      <option value="survival">Survival</option>
+                      <option value="arena">Arena</option>
+                    </select>
+                  </div>
 
-                <div className="col-auto">
-                  <label className="form-label fw-medium mb-2">Order:</label>
-                  <select
-                    value={sortOrder}
-                    onChange={(e) => setSortOrder(e.target.value)}
-                    className="form-select"
-                    style={{ width: '120px' }}
-                  >
-                    <option value="asc">Ascending</option>
-                    <option value="desc">Descending</option>
-                  </select>
-                </div>
+                  <div className="col-auto">
+                    <label className="form-label fw-medium mb-2">
+                      Sort By:
+                    </label>
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value)}
+                      className="form-select"
+                      style={{ width: "150px" }}
+                    >
+                      <option value="score">Score</option>
+                      <option value="damage">Damage</option>
+                      <option value="time_survived">Time Survived</option>
+                    </select>
+                  </div>
 
-                <div className="col-auto">
-                  <button className="btn btn-primary" onClick={handleSearch}>
-                    SEARCH
-                  </button>
-                </div>
+                  <div className="col-auto">
+                    <label className="form-label fw-medium mb-2">Order:</label>
+                    <select
+                      value={sortOrder}
+                      onChange={(e) => setSortOrder(e.target.value)}
+                      className="form-select"
+                      style={{ width: "120px" }}
+                    >
+                      <option value="asc">Ascending</option>
+                      <option value="desc">Descending</option>
+                    </select>
+                  </div>
 
-                <div className="col-auto">
-                  <button className="btn btn-light border" onClick={handleReset}>
-                    RESET
-                  </button>
+                  <div className="col-auto">
+                    <button className="btn btn-primary" onClick={handleSearch}>
+                      SEARCH
+                    </button>
+                  </div>
+
+                  <div className="col-auto">
+                    <button
+                      className="btn btn-light border"
+                      onClick={handleReset}
+                    >
+                      RESET
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
           </div>
           <div className="col-12">
             {isLoading ? (
@@ -285,23 +234,24 @@ function Leaderboard() {
                           </button>
                         </li>
 
-                        {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                          (page) => (
-                            <li
-                              key={page}
-                              className={`page-item ${
-                                currentPage === page ? "active" : ""
-                              }`}
+                        {Array.from(
+                          { length: totalPages },
+                          (_, i) => i + 1
+                        ).map((page) => (
+                          <li
+                            key={page}
+                            className={`page-item ${
+                              currentPage === page ? "active" : ""
+                            }`}
+                          >
+                            <button
+                              className="page-link"
+                              onClick={() => goToPage(page)}
                             >
-                              <button
-                                className="page-link"
-                                onClick={() => goToPage(page)}
-                              >
-                                {page}
-                              </button>
-                            </li>
-                          )
-                        )}
+                              {page}
+                            </button>
+                          </li>
+                        ))}
 
                         <li
                           className={`page-item ${
