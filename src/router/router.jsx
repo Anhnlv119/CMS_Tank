@@ -52,7 +52,7 @@ const router = createBrowserRouter([
         loader: checkAuth
     },
     {
-        path: '/package-statisticsry',
+        path: '/package-statistics',
         element: <PackageStatistics />,
         loader: checkAuth
     }

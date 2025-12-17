@@ -1,24 +1,22 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useEffect, useState, useMemo, useCallback } from "react";
+import { useParams } from "react-router-dom";
 import Header from "./header.jsx";
 
 function Leaderboard() {
   const { leaderboard } = useParams();
   const [users, setUsers] = useState([]);
-  const [date, setDate] = useState("2025-11-16");
+  const today = new Date().toISOString().split("T")[0];
+  const [date, setDate] = useState(today);
   const [minigameType, setMinigameType] = useState("survival");
   const [sortBy, setSortBy] = useState("score");
   const [sortOrder, setSortOrder] = useState("desc");
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const itemsPerPage = 10;
 
-  useEffect(() => {
-    fetchLeaderboard();
-  }, [leaderboard]);
-
-  const fetchLeaderboard = async () => {
+  // Memoize fetch function to prevent recreating on every render
+  const fetchLeaderboard = useCallback(async () => {
     setIsLoading(true);
     try {
       const period = leaderboard || "week";
@@ -39,48 +37,59 @@ function Leaderboard() {
         }
       );
       setUsers(response.data.data.entries || []);
-      setCurrentPage(1);
+      setCurrentPage(1); // Reset to first page on new data
     } catch (error) {
       console.error("Error fetching data:", error);
       setUsers([]);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [leaderboard, minigameType, sortBy, sortOrder, date]);
+
+  // Only fetch when leaderboard type changes (tab change)
+  useEffect(() => {
+    fetchLeaderboard();
+  }, [fetchLeaderboard]);
 
   const handleSearch = () => {
     fetchLeaderboard();
   };
 
   const handleReset = () => {
-    setDate("2025-11-16");
+    setDate(today);
     setMinigameType("survival");
     setSortBy("score");
     setSortOrder("desc");
+    setCurrentPage(1);
+    fetchLeaderboard();
   };
 
-  // Calculate pagination
+  // Memoize pagination calculations
+  const paginationData = useMemo(() => {
+    const totalPages = Math.ceil(users.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const currentUsers = users.slice(startIndex, endIndex);
 
-  const totalPages = Math.ceil(users.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentUsers = users.slice(startIndex, endIndex);
+    return {
+      totalPages,
+      startIndex,
+      endIndex,
+      currentUsers,
+    };
+  }, [users, currentPage, itemsPerPage]);
 
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
+  const handlePreviousPage = useCallback(() => {
+    setCurrentPage((prev) => Math.max(1, prev - 1));
+  }, []);
 
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
+  const handleNextPage = useCallback(() => {
+    setCurrentPage((prev) => Math.min(paginationData.totalPages, prev + 1));
+  }, [paginationData.totalPages]);
 
-  const goToPage = (pageNumber) => {
+  const goToPage = useCallback((pageNumber) => {
     setCurrentPage(pageNumber);
-  };
+  }, []);
 
   const leaderboardTitle =
     leaderboard?.charAt(0).toUpperCase() + leaderboard?.slice(1) || "Week";
@@ -156,8 +165,12 @@ function Leaderboard() {
                   </div>
 
                   <div className="col-auto">
-                    <button className="btn btn-primary" onClick={handleSearch}>
-                      SEARCH
+                    <button
+                      className="btn btn-primary"
+                      onClick={handleSearch}
+                      disabled={isLoading}
+                    >
+                      {isLoading ? "LOADING..." : "SEARCH"}
                     </button>
                   </div>
 
@@ -165,6 +178,7 @@ function Leaderboard() {
                     <button
                       className="btn btn-light border"
                       onClick={handleReset}
+                      disabled={isLoading}
                     >
                       RESET
                     </button>
@@ -173,6 +187,7 @@ function Leaderboard() {
               </div>
             </div>
           </div>
+
           <div className="col-12">
             {isLoading ? (
               <div className="text-center py-5">
@@ -191,10 +206,15 @@ function Leaderboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {currentUsers.length > 0 ? (
-                      currentUsers.map((row, idx) => (
-                        <tr key={idx} className="border-bottom">
-                          <td className="py-3">{idx + 1}</td>
+                    {paginationData.currentUsers.length > 0 ? (
+                      paginationData.currentUsers.map((row, idx) => (
+                        <tr
+                          key={`${row.player_name}-${idx}`}
+                          className="border-bottom"
+                        >
+                          <td className="py-3">
+                            {paginationData.startIndex + idx + 1}
+                          </td>
                           <td className="py-3">{row.player_name}</td>
                           <td className="py-3">{row.score}</td>
                         </tr>
@@ -210,12 +230,13 @@ function Leaderboard() {
                 </table>
 
                 {/* Pagination Controls */}
-                {totalPages > 1 && (
+                {paginationData.totalPages > 1 && (
                   <div className="d-flex justify-content-between align-items-center mt-3">
                     <div>
                       <span>
-                        Page {currentPage} of {totalPages} • Showing{" "}
-                        {currentUsers.length} of {users.length} users
+                        Page {currentPage} of {paginationData.totalPages} •
+                        Showing {paginationData.currentUsers.length} of{" "}
+                        {users.length} users
                       </span>
                     </div>
                     <nav>
@@ -235,7 +256,7 @@ function Leaderboard() {
                         </li>
 
                         {Array.from(
-                          { length: totalPages },
+                          { length: paginationData.totalPages },
                           (_, i) => i + 1
                         ).map((page) => (
                           <li
@@ -255,13 +276,15 @@ function Leaderboard() {
 
                         <li
                           className={`page-item ${
-                            currentPage === totalPages ? "disabled" : ""
+                            currentPage === paginationData.totalPages
+                              ? "disabled"
+                              : ""
                           }`}
                         >
                           <button
                             className="page-link"
                             onClick={handleNextPage}
-                            disabled={currentPage === totalPages}
+                            disabled={currentPage === paginationData.totalPages}
                           >
                             Next
                           </button>
