@@ -1,22 +1,25 @@
 import axios from "axios";
-import { useEffect, useState, useMemo, useCallback } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
 import Header from "./header.jsx";
 
 function Leaderboard() {
+  const today = new Date().toISOString().split("T")[0];
   const { leaderboard } = useParams();
   const [users, setUsers] = useState([]);
-  const today = new Date().toISOString().split("T")[0];
   const [date, setDate] = useState(today);
   const [minigameType, setMinigameType] = useState("survival");
   const [sortBy, setSortBy] = useState("score");
   const [sortOrder, setSortOrder] = useState("desc");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const [itemsPerPage] = useState(10);
 
-  // Memoize fetch function to prevent recreating on every render
-  const fetchLeaderboard = useCallback(async () => {
+  useEffect(() => {
+    fetchLeaderboard();
+  }, [leaderboard]);
+
+  const fetchLeaderboard = async () => {
     setIsLoading(true);
     try {
       const period = leaderboard || "week";
@@ -37,19 +40,14 @@ function Leaderboard() {
         }
       );
       setUsers(response.data.data.entries || []);
-      setCurrentPage(1); // Reset to first page on new data
+      setCurrentPage(1);
     } catch (error) {
       console.error("Error fetching data:", error);
       setUsers([]);
     } finally {
       setIsLoading(false);
     }
-  }, [leaderboard, minigameType, sortBy, sortOrder, date]);
-
-  // Only fetch when leaderboard type changes (tab change)
-  useEffect(() => {
-    fetchLeaderboard();
-  }, [fetchLeaderboard]);
+  };
 
   const handleSearch = () => {
     fetchLeaderboard();
@@ -60,43 +58,37 @@ function Leaderboard() {
     setMinigameType("survival");
     setSortBy("score");
     setSortOrder("desc");
-    setCurrentPage(1);
-    fetchLeaderboard();
   };
 
-  // Memoize pagination calculations
-  const paginationData = useMemo(() => {
-    const totalPages = Math.ceil(users.length / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const currentUsers = users.slice(startIndex, endIndex);
+  // Calculate pagination
 
-    return {
-      totalPages,
-      startIndex,
-      endIndex,
-      currentUsers,
-    };
-  }, [users, currentPage, itemsPerPage]);
+  const totalPages = Math.ceil(users.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentUsers = users.slice(startIndex, endIndex);
 
-  const handlePreviousPage = useCallback(() => {
-    setCurrentPage((prev) => Math.max(1, prev - 1));
-  }, []);
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
 
-  const handleNextPage = useCallback(() => {
-    setCurrentPage((prev) => Math.min(paginationData.totalPages, prev + 1));
-  }, [paginationData.totalPages]);
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
 
-  const goToPage = useCallback((pageNumber) => {
+  const goToPage = (pageNumber) => {
     setCurrentPage(pageNumber);
-  }, []);
+  };
 
   const leaderboardTitle =
     leaderboard?.charAt(0).toUpperCase() + leaderboard?.slice(1) || "Week";
 
   return (
     <div className="App">
-      <div className="py-2 container">
+      <div className="py-2 container-fluid">
         <Header />
 
         <div className="row">
@@ -165,12 +157,8 @@ function Leaderboard() {
                   </div>
 
                   <div className="col-auto">
-                    <button
-                      className="btn btn-primary"
-                      onClick={handleSearch}
-                      disabled={isLoading}
-                    >
-                      {isLoading ? "LOADING..." : "SEARCH"}
+                    <button className="btn btn-primary" onClick={handleSearch}>
+                      SEARCH
                     </button>
                   </div>
 
@@ -178,7 +166,6 @@ function Leaderboard() {
                     <button
                       className="btn btn-light border"
                       onClick={handleReset}
-                      disabled={isLoading}
                     >
                       RESET
                     </button>
@@ -187,8 +174,7 @@ function Leaderboard() {
               </div>
             </div>
           </div>
-
-          <div className="col-12">
+          <div className="col-12 p-5">
             {isLoading ? (
               <div className="text-center py-5">
                 <div className="spinner-border" role="status">
@@ -197,7 +183,7 @@ function Leaderboard() {
               </div>
             ) : (
               <>
-                <table className="table table-sm mb-0">
+                <table className="table table-striped table-hover table-bordered table-sm mb-0 p-4">
                   <thead>
                     <tr className="border-bottom">
                       <th className="fw-bold text-dark py-3">Index</th>
@@ -206,15 +192,10 @@ function Leaderboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {paginationData.currentUsers.length > 0 ? (
-                      paginationData.currentUsers.map((row, idx) => (
-                        <tr
-                          key={`${row.player_name}-${idx}`}
-                          className="border-bottom"
-                        >
-                          <td className="py-3">
-                            {paginationData.startIndex + idx + 1}
-                          </td>
+                    {currentUsers.length > 0 ? (
+                      currentUsers.map((row, idx) => (
+                        <tr key={idx} className="border-bottom">
+                          <td className="py-3">{idx + 1}</td>
                           <td className="py-3">{row.player_name}</td>
                           <td className="py-3">{row.score}</td>
                         </tr>
@@ -230,13 +211,12 @@ function Leaderboard() {
                 </table>
 
                 {/* Pagination Controls */}
-                {paginationData.totalPages > 1 && (
+                {totalPages > 1 && (
                   <div className="d-flex justify-content-between align-items-center mt-3">
                     <div>
                       <span>
-                        Page {currentPage} of {paginationData.totalPages} •
-                        Showing {paginationData.currentUsers.length} of{" "}
-                        {users.length} users
+                        Page {currentPage} of {totalPages} • Showing{" "}
+                        {currentUsers.length} of {users.length} users
                       </span>
                     </div>
                     <nav>
@@ -256,7 +236,7 @@ function Leaderboard() {
                         </li>
 
                         {Array.from(
-                          { length: paginationData.totalPages },
+                          { length: totalPages },
                           (_, i) => i + 1
                         ).map((page) => (
                           <li
@@ -276,15 +256,13 @@ function Leaderboard() {
 
                         <li
                           className={`page-item ${
-                            currentPage === paginationData.totalPages
-                              ? "disabled"
-                              : ""
+                            currentPage === totalPages ? "disabled" : ""
                           }`}
                         >
                           <button
                             className="page-link"
                             onClick={handleNextPage}
-                            disabled={currentPage === paginationData.totalPages}
+                            disabled={currentPage === totalPages}
                           >
                             Next
                           </button>

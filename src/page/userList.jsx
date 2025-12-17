@@ -55,14 +55,14 @@ function ListUsers() {
 
   return (
     <div className="App">
-      <div className="py-2 container">
+      <div className="py-2 container-fluid">
         <Header />
         <div className="row">
           <div className="col-12">
             <h2 className="h2 fw-bold">Users</h2>
           </div>
-          <div className="col-12">
-            <table className="table table-striped table-hover">
+          <div className="col-12 p-5">
+            <table className="table table-striped table-hover table-bordered">
               <thead>
                 <tr>
                   <th>username</th>

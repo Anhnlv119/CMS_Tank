@@ -10,8 +10,8 @@ export default function SubscriptionHistory() {
   const [toDate, setToDate] = useState("");
   const [users, setUsers] = useState([]);
   const [msisdn, setMsisdn] = useState("");
-  const [limit, setLimit] = useState();
-  const [offset, setOffset] = useState();
+  const [limit] = useState();
+  const [offset] = useState();
   const [isLoading, setIsLoading] = useState(true);
   const { params } = useParams();
   const [currentPage, setCurrentPage] = useState(1);
@@ -51,9 +51,6 @@ export default function SubscriptionHistory() {
     }
   };
 
-  const handleSearch = () => {
-    fetchLeaderboard();
-  };
 
   const totalPages = Math.ceil(users.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -80,7 +77,7 @@ export default function SubscriptionHistory() {
 
   return (
     <div className="min-vh-100 bg-light p-5 pt-1">
-      <div className="container-lg">
+      <div className="container-fluid">
         <Header />
         <hr />
         <h1 className="display-5 fw-bold text-dark mb-4">
@@ -133,7 +130,13 @@ export default function SubscriptionHistory() {
               </div>
 
               <div className="col-12 col-md-3">
-                <button className="btn btn-primary w-100" onClick={handleSearch}>SEARCH</button>
+                <button
+                  className="btn btn-primary w-100"
+                  onClick={fetchLeaderboard}
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Loading..." : "Search"}
+                </button>
               </div>
             </div>
 
