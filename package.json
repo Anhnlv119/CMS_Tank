@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://anhnlv119.github.io/CMS_Tank/",
+  "homepage": "http://146.88.41.51:9000/CMS_Tank/",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

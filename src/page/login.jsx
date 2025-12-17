@@ -13,55 +13,104 @@ const navigate = useNavigate();
 
 
   const handleLogin = async(e) => {
-     e.preventDefault();
-     setError("");
-     setIsLoading(true);
- 
-     try {
-       const hashedPassword = md5(password);
- 
-       const response = await fetch('http://146.88.41.51:8998/auth/loginStaff', { 
-         method: 'POST',
-         headers: {
-           'Content-Type': 'application/json',
-         },
-         body: JSON.stringify({ 
-           username, 
-           password: hashedPassword 
-         }),
-       });
- 
-       if (!response.ok) {
-         const errorData = await response.json();
-         throw new Error(errorData.message || 'Login failed');
-       }
- 
-       const data = await response.json();
-       
-       // Store token and expiration timestamp (1 hour = 3600000 ms)
-       const expirationTime = Date.now() + 3600000;
-       localStorage.setItem('authToken', data.access_token);
-       localStorage.setItem('tokenExpiration', expirationTime);
-       
-       console.log('Login successful:', data);
-       setIsLoading(false);
-       
-       // Set timeout to clear token after 1 hour
-       setTimeout(() => {
-         localStorage.removeItem('authToken');
-         localStorage.removeItem('tokenExpiration');
-         console.log('Token expired and cleared');
-         navigate('/login');
-       }, 3600000);
-       
-       navigate('/home');
-       
-     } catch (err) {
-       setError(err.message);
-       setIsLoading(false);
-       console.log(username + "\n" + password + "\n" + err.message);
-     }
-   };
+  e.preventDefault();
+  setError("");
+  setIsLoading(true);
+
+  try {
+    const hashedPassword = md5(password);
+
+    const response = await fetch('http://146.88.41.51:8998/auth/loginStaff', { 
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        username, 
+        password: hashedPassword 
+      }),
+      credentials: 'include' // Important for cookies
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Login failed');
+    }
+
+    const data = await response.json();
+    
+    // Store token in cookie (1 hour expiration)
+    const expirationDate = new Date();
+    expirationDate.setTime(expirationDate.getTime() + (60 * 60 * 1000)); // 1 hour
+    document.cookie = `authToken=${data.access_token}; expires=${expirationDate.toUTCString()}; path=/; secure; samesite=strict`;
+    document.cookie = `tokenExpiration=${expirationDate.getTime()}; expires=${expirationDate.toUTCString()}; path=/; secure; samesite=strict`;
+    
+    // Store in sessionStorage as backup
+    sessionStorage.setItem('authToken', data.access_token);
+    sessionStorage.setItem('tokenExpiration', expirationDate.getTime());
+    
+    console.log('Login successful:', data);
+    setIsLoading(false);
+    
+    // Set timeout to logout and redirect after 1 hour
+    setTimeout(() => {
+      handleLogout();
+    }, 3600000); // 1 hour
+    
+    navigate('/home');
+    
+  } catch (err) {
+    setError(err.message);
+    setIsLoading(false);
+    console.log(username + "\n" + password + "\n" + err.message);
+  }
+};
+
+// Logout function - clears session and cookies then redirects to login
+const handleLogout = () => {
+  // Clear sessionStorage
+  sessionStorage.clear();
+  
+  // Clear cookies
+  deleteCookie('authToken');
+  deleteCookie('tokenExpiration');
+  
+  console.log('Session expired - redirecting to login');
+  
+  // Redirect to login page
+  navigate('/login');
+};
+
+// Helper function to delete cookies
+const deleteCookie = (name) => {
+  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+};
+
+// Helper function to get cookie value
+const getCookie = (name) => {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+  return null;
+};
+
+// Check if session is valid (call this on protected pages)
+const checkSession = () => {
+  const token = getCookie('authToken');
+  const expiration = getCookie('tokenExpiration');
+  
+  if (!token || !expiration) {
+    navigate('/login');
+    return false;
+  }
+  
+  if (Date.now() > parseInt(expiration)) {
+    handleLogout();
+    return false;
+  }
+  
+  return true;
+};
 
 return (
 <section className="bg-info p-3 p-md-4 p-xl-5 vh-100">
