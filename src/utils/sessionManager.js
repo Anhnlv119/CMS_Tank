@@ -36,7 +36,7 @@ export const deleteCookie = (name) => {
 export const storeAuth = (token) => {
   const expirationDate = new Date();
   expirationDate.setTime(expirationDate.getTime() + 60 * 60 * 1000); // 1 hour
-
+  console.log("Storing auth token, expires at:", expirationDate);
   // Store token & expiration in cookies
   setCookie("authToken", token, expirationDate);
   setCookie("tokenExpiration", expirationDate.getTime(), expirationDate);
