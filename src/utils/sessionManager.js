@@ -71,7 +71,7 @@ export const isSessionValid = () => {
     getCookie("tokenExpiration") ||
     sessionStorage.getItem("tokenExpiration");
 
-  if (!token || !expiration) {
+  if (!token && !expiration) {
     return false;
   }
 

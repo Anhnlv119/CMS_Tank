@@ -1,59 +1,49 @@
 import React, { useEffect, useState } from "react";
 import Header from "./header.jsx";
-import axios from "axios";
 import { getToken } from "../utils/sessionManager";
 
 export default function GameAccountManager() {
   const [msisdn, setMsisdn] = useState("");
   const [rewardCode, setRewardCode] = useState("LOYALTY_1000");
   const [reason, setReason] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
-  const [data, setData] = useState([]);
+  const [, setIsLoading] = useState(true);
+  const [data, setData] = useState(null);
 
   const handleSubmit = async () => {
-  setIsLoading(true);
-  try {
-    const params = new URLSearchParams({
-        rewardCode,
-        msisdn,
-    });
+    setIsLoading(true);
+    try {
+      const url = `http://146.88.41.51:8998/dashboard/redeem_code?rewardCode=${rewardCode}&msisdn=${msisdn}`;
 
-    const response = await axios.post(
-      `http://146.88.41.51:8998/dashboard/redeem_code?${params.toString()}`,
-      {},
-      {
+      const response = await fetch(url, {
+        method: "POST",
         headers: {
           Authorization: `Bearer ${getToken()}`,
         },
-      }
-    );
-
-    setData(response.data);
-    setMsisdn("");
-    setRewardCode("LOYALTY_1000");
-    setReason("");
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    setData({ success: false });
-  } finally {
-    setIsLoading(false);
-  }
-};
-
-
-  const checkBoolen = () => {
-    if(data.success === true){
-      alert("Success");
-    } else {
-      alert("Failed");
+      });
+      console.log("Response:", response);
+      const json = await response.json();
+      setData(json);
+      setMsisdn("");
+      setRewardCode("LOYALTY_1000");
+      setReason("");
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setData({ success: false });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    if (data.length == 0) return;
-    console.log("Data changed:", data);
-    checkBoolen();
-  }, [data]);
+  if (!data) return;
+
+  if (data.success === true) {
+    alert("Success");
+  } else {
+    alert("Failed");
+  }
+}, [data]);
+
 
   return (
     <div className="min-vh-100 bg-light p-5 pt-1">
@@ -95,9 +85,9 @@ export default function GameAccountManager() {
                     style={{ maxWidth: "200px" }}
                   >
                     <option value="LOYALTY_1000">LOYALTY_1000</option>
-                    <option value="LOYALTY_500">LOYALTY_500</option>
-                    <option value="WELCOME_BONUS">WELCOME_BONUS</option>
-                    <option value="REFERRAL_BONUS">REFERRAL_BONUS</option>
+                    <option value="TANKS_DAILY">TANKS_DAILY</option>
+                    <option value="TANKS_WEEKLY">TANKS_WEEKLY</option>
+                    <option value="TANKS_MONTHLY">TANKS_MONTHLY</option>
                   </select>
                 </div>
               </div>

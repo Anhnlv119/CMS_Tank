@@ -1,153 +1,180 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { getToken } from "../utils/sessionManager";
 import Header from "./header.jsx";
+
 function ListUsers() {
   const [users, setUsers] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+  const [username, setUsername] = useState("");
 
-  const componentDidMount = async () => {
-    axios
-      .get("http://146.88.41.51:8998/user/users", {
-        headers: {      
-        Authorization: "Bearer " + getToken(),
+  const fetchUsers = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.get("http://146.88.41.51:8998/user/users", {
+        headers: {
+          Authorization: "Bearer " + getToken(),
         },
-      })
-      .then((response) => {
-        const data = response.data;
-        setUsers(data);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-        setIsLoading(false);
       });
+
+      setUsers(response.data || []);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
-    componentDidMount();
+    fetchUsers();
   }, []);
 
-  // Calculate pagination
-  const totalPages = Math.ceil(users.length / itemsPerPage);
+  // Pagination
+  // const totalPages = Math.ceil(users.length / itemsPerPage) || 1;
+  // const startIndex = (currentPage - 1) * itemsPerPage;
+  const filteredUsers = username
+    ? users.filter((u) =>
+        u.username?.toLowerCase().includes(username.toLowerCase())
+      )
+    : users;
+
+  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage) || 1;
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentUsers = users.slice(startIndex, endIndex);
-
-  const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  const goToPage = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
+  const currentUsers = filteredUsers.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
 
   return (
     <div className="App">
       <div className="py-2 container-fluid">
         <Header />
+
         <div className="row">
           <div className="col-12">
             <h2 className="h2 fw-bold">Users</h2>
           </div>
+
+          <div className="card shadow-sm mb-4">
+            <div className="card-body p-4">
+              <div className="row g-3 align-items-end">
+                <div className="col-12 col-md-3">
+                  <label className="form-label fw-medium">User name</label>
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="Enter username"
+                    className="form-control"
+                  />
+                </div>
+
+                <div className="col-12 col-md-3">
+                  <button
+                    className="btn btn-primary w-100"
+                    onClick={fetchUsers}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Loading..." : "Search"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="col-12 p-5">
             <table className="table table-striped table-hover table-bordered">
               <thead>
                 <tr>
-                  <th>username</th>
-                  <th>name</th>
-                  <th>roles</th>
+                  <th>Username</th>
+                  <th>Name</th>
+                  <th>Roles</th>
+                  <th>Create Date</th>
                 </tr>
               </thead>
-              {isLoading ? (
-                <tbody>
+              <tbody>
+                {isLoading ? (
                   <tr>
-                    <td colSpan="4" className="text-center py-4">
+                    <td colSpan="3" className="text-center py-4">
                       Loading...
                     </td>
                   </tr>
-                </tbody>
-              ) : (
-                <tbody>
-                  {currentUsers.map((user) => (
-                    <tr className="cursor-pointer" key={user.username}>
+                ) : currentUsers.length === 0 ? (
+                  <tr>
+                    <td colSpan="3" className="text-center py-4">
+                      No users found
+                    </td>
+                  </tr>
+                ) : (
+                  currentUsers.map((user) => (
+                    <tr key={user.username}>
                       <td>{user.username}</td>
                       <td>{user.name}</td>
-                      <td>{user.roles}</td>
+                      <td>
+                        {Array.isArray(user.roles)
+                          ? user.roles.join(", ")
+                          : user.roles}
+                      </td>
+                      <td>{user.createby}</td>
                     </tr>
-                  ))}
-                </tbody>
-              )}
+                  ))
+                )}
+              </tbody>
             </table>
 
-            {/* Pagination Controls */}
             <div className="d-flex justify-content-between align-items-center mt-3">
-              <div>
-                <span>
-                  Page {currentPage} of {totalPages} • Showing{" "}
-                  {currentUsers.length} of {users.length} users
-                </span>
-              </div>
-              <nav>
-                <ul className="pagination mb-0">
-                  <li
-                    className={`page-item ${
-                      currentPage === 1 ? "disabled" : ""
-                    }`}
-                  >
-                    <button
-                      className="page-link"
-                      onClick={handlePreviousPage}
-                      disabled={currentPage === 1}
-                    >
-                      Previous
-                    </button>
-                  </li>
+              <span>
+                Page {currentPage} of {totalPages} • Showing{" "}
+                {currentUsers.length} of {filteredUsers.length} users
+              </span>
 
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                    (page) => (
-                      <li
-                        key={page}
-                        className={`page-item ${
-                          currentPage === page ? "active" : ""
-                        }`}
+              <ul className="pagination mb-0">
+                <li
+                  className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+                >
+                  <button
+                    className="page-link"
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  >
+                    Previous
+                  </button>
+                </li>
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (page) => (
+                    <li
+                      key={page}
+                      className={`page-item ${
+                        currentPage === page ? "active" : ""
+                      }`}
+                    >
+                      <button
+                        className="page-link"
+                        onClick={() => setCurrentPage(page)}
                       >
-                        <button
-                          className="page-link"
-                          onClick={() => goToPage(page)}
-                        >
-                          {page}
-                        </button>
-                      </li>
-                    )
-                  )}
+                        {page}
+                      </button>
+                    </li>
+                  )
+                )}
 
-                  <li
-                    className={`page-item ${
-                      currentPage === totalPages ? "disabled" : ""
-                    }`}
+                <li
+                  className={`page-item ${
+                    currentPage === totalPages ? "disabled" : ""
+                  }`}
+                >
+                  <button
+                    className="page-link"
+                    onClick={() =>
+                      setCurrentPage((p) => Math.min(totalPages, p + 1))
+                    }
                   >
-                    <button
-                      className="page-link"
-                      onClick={handleNextPage}
-                      disabled={currentPage === totalPages}
-                    >
-                      Next
-                    </button>
-                  </li>
-                </ul>
-              </nav>
+                    Next
+                  </button>
+                </li>
+              </ul>
             </div>
           </div>
         </div>

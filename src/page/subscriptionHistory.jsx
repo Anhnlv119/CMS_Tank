@@ -4,6 +4,8 @@ import axios from "axios";
 import { Link, useParams } from "react-router-dom";
 import { getToken } from "../utils/sessionManager";
 import Header from "./header.jsx";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 export default function SubscriptionHistory() {
   const [fromDate, setFromDate] = useState("");
@@ -16,7 +18,6 @@ export default function SubscriptionHistory() {
   const { params } = useParams();
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
-  
 
   useEffect(() => {
     fetchLeaderboard();
@@ -37,7 +38,7 @@ export default function SubscriptionHistory() {
         `http://146.88.41.51:8998/package/packages/transactions?${params.toString()}`,
         {
           headers: {
-          Authorization: "Bearer " + getToken(),
+            Authorization: "Bearer " + getToken(),
           },
         }
       );
@@ -51,6 +52,27 @@ export default function SubscriptionHistory() {
     }
   };
 
+  const exportToExcel = () => {
+    console.log("Exporting to Excel:", users);
+    // Chuyển data thành worksheet
+    const worksheet = XLSX.utils.json_to_sheet(users);
+
+    // Tạo workbook
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "SubscriptionHistory");
+
+    // Ghi file
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+
+    const blob = new Blob([excelBuffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+
+    saveAs(blob, "listSubscriptionHistory.xlsx");
+  };
 
   const totalPages = Math.ceil(users.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -83,7 +105,7 @@ export default function SubscriptionHistory() {
         <h1 className="display-5 fw-bold text-dark mb-4">
           SUBSCRIPTION PURCHASE HISTORY
         </h1>
-
+        <button onClick={exportToExcel}>Export to Excel</button>
         {/* Filter Section */}
         <div className="card shadow-sm mb-4">
           <div className="card-body p-4">
