@@ -40,6 +40,33 @@ function ListUsers() {
       )
     : users;
 
+
+  const updateUserStatus = async (code, banned) => {
+        console.log(code+ "----" + banned);
+
+  try {
+    await axios.post(
+      "http://146.88.41.51:8998/user/update-status",
+      {
+        code,
+        banned,
+      },
+      {
+        headers: {
+          Authorization: "Bearer " + getToken(),
+        },
+      }
+    );
+    setUsers((prev) =>
+      prev.map((u) =>
+        u.code === code ? { ...u, banned } : u
+      )
+    );
+  } catch (error) {
+    console.error("Error updating user status:", error);
+  }
+};
+
   const totalPages = Math.ceil(filteredUsers.length / itemsPerPage) || 1;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentUsers = filteredUsers.slice(
@@ -92,6 +119,8 @@ function ListUsers() {
                   <th>Name</th>
                   <th>Roles</th>
                   <th>Create Date</th>
+                  <th>Status</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -118,6 +147,31 @@ function ListUsers() {
                           : user.roles}
                       </td>
                       <td>{user.createby}</td>
+
+                      {/* STATUS */}
+                      <td>
+                        <span
+                          className={`badge ${
+                            user.banned ? "bg-danger" : "bg-success"
+                          }`}
+                        >
+                          {user.banned ? "Inactive" : "Active"}
+                        </span>
+                      </td>
+
+                      {/* ACTION */}
+                      <td>
+                        <button
+                          className={`btn btn-sm ${
+                            user.banned ? "btn-success" : "btn-danger"
+                          }`}
+                          onClick={() =>
+                            updateUserStatus(user.code, !user.banned)
+                          }
+                        >
+                          {user.banned ? "Activate" : "Deactivate"}
+                        </button>
+                      </td>
                     </tr>
                   ))
                 )}
