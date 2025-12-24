@@ -63,7 +63,12 @@ function ListUsers() {
       )
     );
   } catch (error) {
+    if(error.response.data.code === 403){
+      alert("You do not have permission to perform this action.");
+      return;
+    }
     console.error("Error updating user status:", error);
+    
   }
 };
 
