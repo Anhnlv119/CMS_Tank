@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import Header from "./header.jsx";
+import Sidebar from "./sidebar.jsx";
 
 function Leaderboard() {
   const today = new Date().toISOString().split("T")[0];
@@ -88,10 +88,12 @@ function Leaderboard() {
 
   return (
     <div className="App">
-      <div className="py-2 container-fluid">
-        <Header />
+      <div className="d-flex">
+        {/* LEFT SIDEBAR */}
+        <Sidebar />
 
-        <div className="row">
+        {/* RIGHT CONTENT */}
+        <div className="flex-grow-1 p-4">
           <div className="container-fluid p-4">
             {/* Filter Card */}
             <div className="card border-0 shadow-sm mb-4">

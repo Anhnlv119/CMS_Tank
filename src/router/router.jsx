@@ -6,6 +6,7 @@ import SubscriptionHistory from "../page/subscriptionHistory.jsx"
 import { isSessionValid, clearAuth } from "../utils/sessionManager"
 import PackageStatistics from "../page/packageStatistics.jsx"
 import GameAccountManager from "../page/gameAccountManager.jsx"
+import CreateStaff from "../page/createStaff.jsx"
 
 // Loader function to check authentication
 const checkAuth = () => {
@@ -55,6 +56,11 @@ const router = createBrowserRouter([
     {
         path: '/game-account-manager',
         element: <GameAccountManager />,
+        loader: checkAuth
+    },
+      {
+        path: '/create-staff',
+        element: <CreateStaff />,
         loader: checkAuth
     },
     {

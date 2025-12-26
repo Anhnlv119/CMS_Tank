@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Header from "./header.jsx";
+import Sidebar from "./sidebar.jsx";
 import { getToken } from "../utils/sessionManager";
 
 export default function GameAccountManager() {
@@ -91,10 +91,13 @@ export default function GameAccountManager() {
   };
 
   return (
-    <div className="min-vh-100 bg-light p-5 pt-1">
-      <div className="container-fluid">
-        <Header />
-        <div className="container py-5">
+    <div className="App">
+      <div className="d-flex">
+  {/* LEFT SIDEBAR */}
+  <Sidebar />
+
+  {/* RIGHT CONTENT */}
+  <div className="flex-grow-1 p-4">
           <h1 className="mb-4">GAME ACCOUNT MANAGER</h1>
 
           <div className="card">
