@@ -40,7 +40,7 @@ function Login() {
       const data = await response.json();
       
       // Store authentication data using session manager
-      storeAuth(data.access_token);
+      storeAuth(data.access_token, data.roles);
       
       console.log('Login successful:', data);
       setIsLoading(false);

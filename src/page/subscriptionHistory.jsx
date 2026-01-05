@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Calendar } from "lucide-react";
 import axios from "axios";
 import { Link, useParams } from "react-router-dom";
-import { getToken } from "../utils/sessionManager";
+import { getToken, getUserRoles } from "../utils/sessionManager";
 import Sidebar from "./sidebar.jsx";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
@@ -18,6 +18,7 @@ export default function SubscriptionHistory() {
   const { params } = useParams();
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+  const roles = getUserRoles();
 
   useEffect(() => {
     fetchLeaderboard();
@@ -108,7 +109,7 @@ export default function SubscriptionHistory() {
           <h1 className="display-5 fw-bold text-dark mb-4">
             SUBSCRIPTION PURCHASE HISTORY
           </h1>
-          <button onClick={exportToExcel}>Export to Excel</button>
+          {roles.includes("adsgr_supervisor") && <button onClick={exportToExcel}>Export to Excel</button>}
           {/* Filter Section */}
           <div className="card shadow-sm mb-4">
             <div className="card-body p-4">

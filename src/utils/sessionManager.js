@@ -33,21 +33,20 @@ export const deleteCookie = (name) => {
 /**
  * Store authentication data (1 hour session)
  */
-export const storeAuth = (token) => {
+export const storeAuth = (token, roles) => {
   const expirationDate = new Date();
-  expirationDate.setTime(expirationDate.getTime() + 60 * 60 * 1000); // 1 hour
-  console.log("Storing auth token, expires at:", expirationDate);
-  // Store token & expiration in cookies
+  expirationDate.setTime(expirationDate.getTime() + 60 * 60 * 1000);
+
   setCookie("authToken", token, expirationDate);
   setCookie("tokenExpiration", expirationDate.getTime(), expirationDate);
+  setCookie("userRoles", JSON.stringify(roles), expirationDate);
 
-  // Backup in sessionStorage (optional but useful)
   sessionStorage.setItem("authToken", token);
-  sessionStorage.setItem(
-    "tokenExpiration",
-    expirationDate.getTime().toString()
-  );
+  sessionStorage.setItem("tokenExpiration", expirationDate.getTime().toString());
+  sessionStorage.setItem("userRoles", JSON.stringify(roles));
 };
+
+
 
 /**
  * Clear all authentication data
@@ -55,12 +54,13 @@ export const storeAuth = (token) => {
 export const clearAuth = () => {
   deleteCookie("authToken");
   deleteCookie("tokenExpiration");
+  deleteCookie("userRoles");
 
   sessionStorage.removeItem("authToken");
   sessionStorage.removeItem("tokenExpiration");
-
-  console.log("Session cleared");
+  sessionStorage.removeItem("userRoles");
 };
+
 
 /**
  * Check if session is still valid
@@ -120,3 +120,13 @@ export const setupSessionTimeout = (onTimeout) => {
     onTimeout();
   }, remainingTime);
 };
+
+export const getUserRoles = () => {
+  const roles =
+    getCookie("userRoles") ||
+    sessionStorage.getItem("userRoles");
+
+  return roles ? JSON.parse(roles) : [];
+};
+
+

@@ -92,7 +92,7 @@ export default function GameAccountManager() {
 
   return (
     <div className="App">
-      <div className="d-flex">
+        <div className="d-flex">
   {/* LEFT SIDEBAR */}
   <Sidebar />
 
