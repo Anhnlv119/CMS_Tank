@@ -7,6 +7,7 @@ import { isSessionValid, clearAuth, getUserRoles } from "../utils/sessionManager
 import PackageStatistics from "../page/packageStatistics.jsx"
 import GameAccountManager from "../page/gameAccountManager.jsx"
 import CreateStaff from "../page/createStaff.jsx"
+import StatsDays from "../page/stats-days.jsx";
 
 // Loader function to check authentication
 export const checkAuth = () => {
@@ -68,9 +69,14 @@ const router = createBrowserRouter([
         element: <ListUsers />,
         loader: checkAuth
     },
-     {
+    {
         path: '/package-statistics',
         element: <PackageStatistics />,
+        loader: checkAuth
+    },
+    {
+        path: '/stats', 
+        element: <StatsDays/>,
         loader: checkAuth
     },
     {

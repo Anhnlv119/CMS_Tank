@@ -121,6 +121,16 @@ const Sidebar = memo(() => {
             Package Statistics
           </NavLink>
         </li>
+        <li className="nav-item mb-2">
+          <NavLink
+            to="/stats"
+            className={({ isActive }) =>
+              `nav-link ${isActive ? "active" : "link-dark"}`
+            }
+          >
+            Stats
+          </NavLink>
+        </li>
         {/* SUPERVISOR ONLY */}
         {isSupervisor && (
           <>
