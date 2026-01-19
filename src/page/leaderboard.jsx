@@ -32,7 +32,7 @@ function Leaderboard() {
       });
 
       const response = await axios.get(
-        `http://146.88.41.51:8998/leaderboard/get?${params.toString()}`,
+        `http://146.88.41.56:8998/leaderboard/get?${params.toString()}`,
         {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("authToken"),

@@ -26,7 +26,7 @@ const Sidebar = memo(() => {
   const fetchUsers = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get("http://146.88.41.51:8998/dashboard/online-users", {
+      const response = await axios.get("http://146.88.41.56:8998/dashboard/online-users", {
         headers: {
           Authorization: "Bearer " + getToken(),
         },

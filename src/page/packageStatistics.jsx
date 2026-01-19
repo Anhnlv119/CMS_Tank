@@ -5,7 +5,7 @@ import { getToken } from "../utils/sessionManager";
 import Sidebar from "./sidebar.jsx";
 
 const ITEMS_PER_PAGE = 10;
-const API_URL = "http://146.88.41.51:8998/package/package-statistics";
+const API_URL = "http://146.88.41.56:8998/package/package-statistics";
 
 export default function PackageStatistics() {
   const [users, setUsers] = useState([]);

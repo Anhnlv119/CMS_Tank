@@ -23,7 +23,7 @@ function CreateStaff() {
       const hashedPassword = md5(password);
 
       const response = await fetch(
-        "http://146.88.41.51:8998/user/createStaffAcc",
+        "http://146.88.41.56:8998/user/createStaffAcc",
         {
           method: "POST",
           headers: {
