@@ -36,7 +36,7 @@ export default function SubscriptionHistory() {
       });
 
       const response = await axios.get(
-        `http://146.88.41.56:8998/package/packages/transactions?${params.toString()}`,
+        `https://tank-war.mascom.vn/api/package/packages/transactions?${params.toString()}`,
         {
           headers: {
             Authorization: "Bearer " + getToken(),
