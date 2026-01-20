@@ -13,7 +13,7 @@ function ListUsers() {
   const fetchUsers = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get("http://146.88.41.56:8998/user/users", {
+      const response = await axios.get("https://tank-war.mascom.vn/api/user/users", {
         headers: {
           Authorization: "Bearer " + getToken(),
         },
@@ -45,7 +45,7 @@ function ListUsers() {
 
     try {
       await axios.post(
-        "http://146.88.41.56:8998/user/update-status",
+        "https://tank-war.mascom.vn/api/user/update-status",
         {
           code,
           banned,

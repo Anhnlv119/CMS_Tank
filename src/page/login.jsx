@@ -19,7 +19,7 @@ function Login() {
       const hashedPassword = md5(password);
       console.log("Request body:", JSON.stringify({ username, password: hashedPassword }));
 
-      const response = await fetch('http://146.88.41.56:8998/auth/loginStaff', { 
+      const response = await fetch('https://tank-war.mascom.vn/api/auth/loginStaff', { 
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
