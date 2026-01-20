@@ -132,10 +132,15 @@ export default function GameAccountManager() {
                     onChange={(e) => setRewardCode(e.target.value)}
                     style={{ maxWidth: "200px" }}
                   >
-                    <option value="LOYALTY_1000">LOYALTY_1000</option>
-                    <option value="TANKS_DAILY">TANKS_DAILY</option>
-                    <option value="TANKS_WEEKLY">TANKS_WEEKLY</option>
-                    <option value="TANKS_MONTHLY">TANKS_MONTHLY</option>
+                    <option value="LOYALTY_TANKS_1000">LOYALTY_TANKS_1000</option>
+                    <option value="LOYALTY_TANKS_1500">LOYALTY_TANKS_1500</option>
+                    <option value="LOYALTY_TANKS_2000">LOYALTY_TANKS_2000</option>
+                    <option value="LOYALTY_TANKS_3000">LOYALTY_TANKS_3000</option>
+                    <option value="LOYALTY_TANKS_4000">LOYALTY_TANKS_4000</option>
+                    <option value="LOYALTY_TANKS_5000">LOYALTY_TANKS_5000</option>
+                    <option value="LOYALTY_TANKS_6000">LOYALTY_TANKS_6000</option>
+                    <option value="LOYALTY_TANKS_15K">LOYALTY_TANKS_15K</option>
+                    <option value="LOYALTY_TANKS_25K">LOYALTY_TANKS_25K</option>
                   </select>
                 </div>
               </div>
