@@ -14,7 +14,7 @@ export default function GameAccountManager() {
   const handleSubmit = async () => {
     setIsLoading(true);
     try {
-      const url = `http://146.88.41.56:8998/dashboard/redeem_code?rewardCode=${rewardCode}&msisdn=${msisdn}`;
+      const url = `https://tank-war.mascom.vn/api/dashboard/redeem_code?rewardCode=${rewardCode}&msisdn=${msisdn}`;
 
       const response = await fetch(url, {
         method: "POST",

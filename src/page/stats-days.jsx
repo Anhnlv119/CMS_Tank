@@ -14,7 +14,7 @@ const fetchUsers = async () => {
   try {
     setIsLoading(true);
 
-    let url = "http://146.88.41.56:8998/dashboard/stats";
+    let url = "https://tank-war.mascom.vn/api/dashboard/stats";
 
     if (startDate && endDate && startDate !== endDate) {
       url += `?start_date=${startDate}&end_date=${endDate}`;
