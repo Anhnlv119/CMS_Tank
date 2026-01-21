@@ -14,13 +14,17 @@ export default function GameAccountManager() {
   const handleSubmit = async () => {
     setIsLoading(true);
     try {
-      const url = `https://tank-war.mascom.vn/api/dashboard/redeem_code?rewardCode=${rewardCode}&msisdn=${msisdn}`;
+      const url = `https://tank-war.mascom.vn/api/dashboard/redeem_code`;
 
       const response = await fetch(url, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${getToken()}`,
         },
+        body: JSON.stringify({
+            rewardCode,
+            msisdn,
+          }),
       });
       console.log("Response:", response);
       const json = await response.json();
@@ -139,8 +143,8 @@ export default function GameAccountManager() {
                     <option value="LOYALTY_TANKS_4000">LOYALTY_TANKS_4000</option>
                     <option value="LOYALTY_TANKS_5000">LOYALTY_TANKS_5000</option>
                     <option value="LOYALTY_TANKS_6000">LOYALTY_TANKS_6000</option>
-                    <option value="LOYALTY_TANKS_15K">LOYALTY_TANKS_15K</option>
-                    <option value="LOYALTY_TANKS_25K">LOYALTY_TANKS_25K</option>
+                    <option value="LOYALTY_TANKS_15000">LOYALTY_TANKS_15000</option>
+                    <option value="LOYALTY_TANKS_20000">LOYALTY_TANKS_20000</option>
                   </select>
                 </div>
               </div>
