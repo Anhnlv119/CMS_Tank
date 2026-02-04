@@ -191,6 +191,7 @@ function Leaderboard() {
                       <th className="fw-bold text-dark py-3">Index</th>
                       <th className="fw-bold text-dark py-3">User Name</th>
                       <th className="fw-bold text-dark py-3">Score</th>
+                      <th className="fw-bold text-dark py-3">MSISDN</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -200,11 +201,12 @@ function Leaderboard() {
                           <td className="py-3">{idx + 1}</td>
                           <td className="py-3">{row.player_name}</td>
                           <td className="py-3">{row.score}</td>
+                          <td className="py-3">{row.msisdn}</td>
                         </tr>
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="3" className="text-center py-4">
+                        <td colSpan="4" className="text-center py-4">
                           No data available
                         </td>
                       </tr>
