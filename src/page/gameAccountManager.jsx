@@ -70,7 +70,7 @@ export default function GameAccountManager() {
     }
 
     try {
-      const response = await fetch(`http://146.88.41.51:8998${endpoint}`, {
+      const response = await fetch(`https://tank-war.mascom.vn/api${endpoint}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

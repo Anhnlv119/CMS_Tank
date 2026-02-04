@@ -69,7 +69,7 @@ function Login() {
                 <div className="row">
                   <div className="col-12">
                     <div className="mb-5">
-                      <h3>Log in</h3>
+                      <h3>Tanks War Login</h3>
                       {error && <div className="alert alert-danger">{error}</div>}
                     </div>
                   </div>
