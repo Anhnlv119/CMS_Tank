@@ -13,13 +13,13 @@ function ListUsers() {
   const fetchUsers = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get("https://tank-war.mascom.vn/api/user/users", {
+      const response = await axios.get("https://tank-war.mascom.vn/api/dashboard/get-player-inventory", {
         headers: {
           Authorization: "Bearer " + getToken(),
         },
       });
 
-      setUsers(response.data || []);
+      setUsers(response.data.data || []);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -162,7 +162,10 @@ const getPageNumbers = () => {
                         <tr>
                           <th className="fw-bold py-3">Username</th>
                           <th className="fw-bold py-3">Name</th>
-                          <th className="fw-bold py-3">Roles</th>
+                          <th className="fw-bold py-3">Gold</th>
+                          <th className="fw-bold py-3">Diamond</th>
+                          <th className="fw-bold py-3">Ticket</th>
+                          <th className="fw-bold py-3">Play Ticket</th>
                           <th className="fw-bold py-3">Create Date</th>
                           <th className="fw-bold py-3">Status</th>
                           <th className="fw-bold py-3">Action</th>
@@ -174,12 +177,16 @@ const getPageNumbers = () => {
                             <tr key={user.username}>
                               <td className="py-3">{user.username}</td>
                               <td className="py-3">{user.name}</td>
-                              <td className="py-3">
+                              {/* <td className="py-3">
                                 {Array.isArray(user.roles)
                                   ? user.roles.join(", ")
                                   : user.roles}
-                              </td>
-                              <td className="py-3">{user.createby}</td>
+                              </td> */}
+                              <td className="py-3">{user.coin}</td>
+                              <td className="py-3">{user.gem}</td>
+                              <td className="py-3">{user.ticket}</td>
+                              <td className="py-3">{user.playTicket}</td>
+                              <td className="py-3">{user.created_at}</td>
                               <td className="py-3">
                                 <span
                                   className={`badge ${
