@@ -39,6 +39,7 @@ function Leaderboard() {
           },
         }
       );
+      console.log("Leaderboard data:", response.data.data.entries);
       setUsers(response.data.data.entries || []);
       setCurrentPage(1);
     } catch (error) {

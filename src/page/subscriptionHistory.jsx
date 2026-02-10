@@ -41,7 +41,7 @@ export default function SubscriptionHistory() {
           headers: {
             Authorization: "Bearer " + getToken(),
           },
-        }
+        },
       );
       setUsers(response.data.data.transactions || []);
       setCurrentPage(1);
@@ -75,32 +75,41 @@ export default function SubscriptionHistory() {
     saveAs(blob, "listSubscriptionHistory.xlsx");
   };
 
-  const totalPages = Math.ceil(users.length / itemsPerPage);
+  const MAX_VISIBLE_PAGES = 5;
+
+  const totalPages = Math.ceil(users.length / itemsPerPage) || 1;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentUsers = users.slice(startIndex, endIndex);
 
   const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
+    if (currentPage > 1) setCurrentPage((p) => p - 1);
   };
 
   const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
+    if (currentPage < totalPages) setCurrentPage((p) => p + 1);
   };
 
-  const goToPage = (pageNumber) => {
-    setCurrentPage(pageNumber);
+  const goToPage = (page) => setCurrentPage(page);
+
+  const getPageNumbers = () => {
+    const half = Math.floor(MAX_VISIBLE_PAGES / 2);
+
+    let start = Math.max(1, currentPage - half);
+    let end = Math.min(totalPages, start + MAX_VISIBLE_PAGES - 1);
+
+    if (end - start < MAX_VISIBLE_PAGES - 1) {
+      start = Math.max(1, end - MAX_VISIBLE_PAGES + 1);
+    }
+
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
   };
 
   const totalValue = users.reduce((acc, row) => acc + parseInt(row.price), 0);
 
   return (
     <div className="App">
-      <div className="d-flex">
+      <div className="d-flex flex-column flex-md-row min-vh-100">
         {/* LEFT SIDEBAR */}
         <Sidebar />
 
@@ -109,7 +118,9 @@ export default function SubscriptionHistory() {
           <h1 className="display-5 fw-bold text-dark mb-4">
             SUBSCRIPTION PURCHASE HISTORY
           </h1>
-          {roles.includes("adsgr_supervisor") && <button onClick={exportToExcel}>Export to Excel</button>}
+          {roles.includes("adsgr_supervisor") && (
+            <button onClick={exportToExcel}>Export to Excel</button>
+          )}
           {/* Filter Section */}
           <div className="card shadow-sm mb-4">
             <div className="card-body p-4">
@@ -194,7 +205,7 @@ export default function SubscriptionHistory() {
                   {currentUsers.length > 0 ? (
                     currentUsers.map((row, idx) => (
                       <tr key={idx}>
-                        <td>{idx + 1}</td>
+                        <td>{startIndex + idx + 1}</td>
                         <td>{row.msisdn}</td>
                         <td>
                           <code>{row.transactionId}</code>
@@ -222,64 +233,94 @@ export default function SubscriptionHistory() {
               </table>
               {/* Pagination Controls */}
               {totalPages > 1 && (
-                <div className="d-flex justify-content-between align-items-center mt-3">
-                  <div>
-                    <span>
-                      Page {currentPage} of {totalPages} • Showing{" "}
-                      {currentUsers.length} of {users.length} users
-                    </span>
-                  </div>
-                  <nav>
-                    <ul className="pagination mb-0">
-                      <li
-                        className={`page-item ${
-                          currentPage === 1 ? "disabled" : ""
-                        }`}
-                      >
-                        <button
-                          className="page-link"
-                          onClick={handlePreviousPage}
-                          disabled={currentPage === 1}
-                        >
-                          Previous
-                        </button>
-                      </li>
+                    <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2 mt-3">
+                      <div className="text-muted">
+                        Page {currentPage} of {totalPages} • Showing{" "}
+                        {currentUsers.length} of {users.length} users
+                      </div>
 
-                      {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                        (page) => (
+                      <nav>
+                        <ul className="pagination mb-0 flex-wrap">
+                          {/* PREVIOUS */}
                           <li
-                            key={page}
+                            className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+                          >
+                            <button
+                              className="page-link"
+                              onClick={handlePreviousPage}
+                              disabled={currentPage === 1}
+                            >
+                              Previous
+                            </button>
+                          </li>
+
+                          {/* FIRST PAGE */}
+                          {currentPage > 3 && (
+                            <>
+                              <li className="page-item">
+                                <button
+                                  className="page-link"
+                                  onClick={() => goToPage(1)}
+                                >
+                                  1
+                                </button>
+                              </li>
+                              <li className="page-item disabled">
+                                <span className="page-link">…</span>
+                              </li>
+                            </>
+                          )}
+
+                          {/* PAGE WINDOW */}
+                          {getPageNumbers().map((page) => (
+                            <li
+                              key={page}
+                              className={`page-item ${currentPage === page ? "active" : ""}`}
+                            >
+                              <button
+                                className="page-link"
+                                onClick={() => goToPage(page)}
+                              >
+                                {page}
+                              </button>
+                            </li>
+                          ))}
+
+                          {/* LAST PAGE */}
+                          {currentPage < totalPages - 2 && (
+                            <>
+                              <li className="page-item disabled">
+                                <span className="page-link">…</span>
+                              </li>
+                              <li className="page-item">
+                                <button
+                                  className="page-link"
+                                  onClick={() => goToPage(totalPages)}
+                                >
+                                  {totalPages}
+                                </button>
+                              </li>
+                            </>
+                          )}
+
+                          {/* NEXT */}
+                          <li
                             className={`page-item ${
-                              currentPage === page ? "active" : ""
+                              currentPage === totalPages ? "disabled" : ""
                             }`}
                           >
                             <button
                               className="page-link"
-                              onClick={() => goToPage(page)}
+                              onClick={handleNextPage}
+                              disabled={currentPage === totalPages}
                             >
-                              {page}
+                              Next
                             </button>
                           </li>
-                        )
-                      )}
-
-                      <li
-                        className={`page-item ${
-                          currentPage === totalPages ? "disabled" : ""
-                        }`}
-                      >
-                        <button
-                          className="page-link"
-                          onClick={handleNextPage}
-                          disabled={currentPage === totalPages}
-                        >
-                          Next
-                        </button>
-                      </li>
-                    </ul>
-                  </nav>
-                </div>
-              )}
+                        </ul>
+                      </nav>
+                    </div>
+                  )}
             </div>
           </div>
         </div>
