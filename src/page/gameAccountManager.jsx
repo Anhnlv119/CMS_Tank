@@ -143,6 +143,7 @@ export default function GameAccountManager() {
                     <option value="LOYALTY_TANKS_4000">LOYALTY_TANKS_4000</option>
                     <option value="LOYALTY_TANKS_5000">LOYALTY_TANKS_5000</option>
                     <option value="LOYALTY_TANKS_6000">LOYALTY_TANKS_6000</option>
+                    <option value="LOYALTY_TANKS_10000">LOYALTY_TANKS_10000</option>
                     <option value="LOYALTY_TANKS_15000">LOYALTY_TANKS_15000</option>
                     <option value="LOYALTY_TANKS_20000">LOYALTY_TANKS_20000</option>
                   </select>
